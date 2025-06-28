@@ -2,8 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"golang.org/x/crypto/bcrypt"
-
 	"net/http"
 	"rmssystem_1/database/dbHelper"
 	"rmssystem_1/models"
@@ -53,7 +51,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(req.Password)); err != nil {
+	if !utils.CheckHashPassword(req.Password, hashedPassword) {
 		utils.RespondError(w, http.StatusUnauthorized, nil, "invalid email or password")
 		return
 	}
