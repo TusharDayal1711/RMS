@@ -5,34 +5,20 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"rmssystem_1/config"
 	"rmssystem_1/routes"
 
 	"rmssystem_1/database"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	connStr := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-		os.Getenv("DB_SSLMODE"),
-	)
-
-	database.Init(connStr)
+	config.LoadEnv()
+	dbConnectionString := config.GetDatabaseString()
+	database.Init(dbConnectionString)
 	//handler.CreateSuperAdmin()
 	defer database.DB.Close()
-
 	r := routes.GetRoutes()
+	fmt.Println("Starting server on port " + os.Getenv("SERVER_PORT"))
 	fmt.Println("Server is running on http://localhost:8080")
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		log.Fatal("Server failed:", err)
