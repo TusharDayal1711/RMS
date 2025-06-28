@@ -17,9 +17,8 @@ func SetAddressHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req models.AddressReq
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := utils.ParseJSONBody(r, &req); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
-		return
 	}
 
 	err = dbHelper.SetUserAddress(req, userID)

@@ -11,7 +11,6 @@ func GetDishesByRestaurant(w http.ResponseWriter, r *http.Request) {
 	if restaurantID == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
 			"message": "restaurant_id is required",
 		})
 		return

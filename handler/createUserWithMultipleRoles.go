@@ -11,9 +11,9 @@ import (
 
 func CreateUserWithRoles(w http.ResponseWriter, r *http.Request) {
 	var MultiRolereq models.MultiRole
-	if err := json.NewDecoder(r.Body).Decode(&MultiRolereq); err != nil {
+
+	if err := utils.ParseJSONBody(r, &MultiRolereq); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
-		return
 	}
 
 	CreatorID, role, err := middleware.GetUserAndRolesFromContext(r)

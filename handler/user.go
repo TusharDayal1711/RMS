@@ -14,9 +14,8 @@ import (
 // register new public user
 func RegisterPublicUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		utils.RespondError(w, http.StatusBadRequest, err, "invalid request body")
-		return
+	if err := utils.ParseJSONBody(r, &user); err != nil {
+		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
 	}
 
 	userID, err := dbHelper.CreatePublicUser(user)

@@ -5,15 +5,13 @@ import (
 	"net/http"
 	"rmssystem_1/database/dbHelper"
 	"rmssystem_1/middleware"
+	"rmssystem_1/utils"
 )
 
 func GetUsersCreatedById(w http.ResponseWriter, r *http.Request) {
 	userID, _, err := middleware.GetUserAndRolesFromContext(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "unauthorzed",
-		})
+		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
 		return
 	}
 	users, err := dbHelper.GetUsersCreatedBy(userID)
