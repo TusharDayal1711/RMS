@@ -17,10 +17,7 @@ func GetMyRestaurantsByCreatorId(w http.ResponseWriter, r *http.Request) {
 
 	restaurants, err := dbHelper.GetRestaurantsByCreator(userID)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "failed to fetch restaurants",
-		})
+		utils.RespondError(w, http.StatusInternalServerError, err, "failed to get restaurant")
 		return
 	}
 
