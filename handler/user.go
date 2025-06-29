@@ -34,12 +34,9 @@ func RegisterPublicUser(w http.ResponseWriter, r *http.Request) {
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	var req models.LoginReq
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		utils.RespondError(w, http.StatusBadRequest, err, "invalid request body")
-		return
+	if err := utils.ParseJSONBody(r, &req); err != nil {
+		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
 	}
-
 	if req.Email == "" || req.Password == "" {
 		utils.RespondError(w, http.StatusBadRequest, nil, "email and password are required")
 		return
