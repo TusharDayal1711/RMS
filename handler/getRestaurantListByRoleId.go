@@ -19,7 +19,7 @@ func GetMyRestaurantsByCreatorId(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)
 	if err != nil {
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "failed to fetch users",
+			"message": "failed to fetch restaurants",
 		})
 		return
 	}
