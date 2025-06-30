@@ -17,8 +17,7 @@ import (
 
 func CreatePublicUser(user models.User) (uuid.UUID, error) {
 	user.Email = strings.ToLower(user.Email)
-
-	tx, err := database.DB.Begin()
+	tx, err := database.DB.Beginx()
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -91,7 +90,7 @@ func CreateUser(req models.CreateUserReq, createdBy string) error {
 
 		return err
 	}
-	tx, err := database.DB.Begin()
+	tx, err := database.DB.Beginx()
 	defer func() {
 		if p := recover(); p != nil {
 			tx.Rollback()

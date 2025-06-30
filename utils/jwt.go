@@ -26,13 +26,15 @@ func GenerateJWT(userID string, roles []string) (string, error) {
 
 func ParseJWT(tokenStr string) (string, []string, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method")
+		}
 		return jwtSecret, nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 
 	if err != nil || !token.Valid {
-		return "", nil, errors.New("invalid or expired token")
+		return "", nil, fmt.Errorf("invalid or expired token: %w", err)
 	}
-
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return "", nil, errors.New("invalid token claims")
@@ -42,12 +44,13 @@ func ParseJWT(tokenStr string) (string, []string, error) {
 	if !ok {
 		return "", nil, errors.New("invalid 'sub' claim")
 	}
-
 	var roles []string
-	if AllRoles, ok := claims["roles"].([]interface{}); ok {
-		for _, r := range AllRoles {
-			if roleStr, ok := r.(string); ok {
-				roles = append(roles, roleStr)
+	if rolesClaim, ok := claims["roles"]; ok {
+		if rolesSlice, ok := rolesClaim.([]interface{}); ok {
+			for _, r := range rolesSlice {
+				if roleStr, ok := r.(string); ok {
+					roles = append(roles, roleStr)
+				}
 			}
 		}
 	}
