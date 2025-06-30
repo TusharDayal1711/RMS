@@ -36,6 +36,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var req models.LoginReq
 	if err := utils.ParseJSONBody(r, &req); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
+		return
 	}
 	if req.Email == "" || req.Password == "" {
 		utils.RespondError(w, http.StatusBadRequest, nil, "email and password are required")
