@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"encoding/json"
+	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"rmssystem_1/database/dbHelper"
 	"rmssystem_1/models"
@@ -19,14 +19,14 @@ func RegisterPublicUser(w http.ResponseWriter, r *http.Request) {
 	userID, err := dbHelper.CreatePublicUser(user)
 	if err != nil {
 		if strings.Contains(err.Error(), "email already exists") {
-			utils.RespondError(w, http.StatusConflict, err, "Email is already registered")
+			utils.RespondError(w, http.StatusConflict, err, "email is already registered")
 		} else {
 			utils.RespondError(w, http.StatusInternalServerError, err, "Failed to create user")
 		}
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message": "User created successfully",
 		"user_id": userID,
 	})
@@ -56,7 +56,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	roles, err := dbHelper.GetUserRoles(userID)
 	if err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, err, "failed to fetch user roles")
+		utils.RespondError(w, http.StatusInternalServerError, err, "failed to get user roles")
 		return
 	}
 
@@ -78,7 +78,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message":       "User logged successfully",
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,

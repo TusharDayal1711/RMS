@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"encoding/json"
+	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"rmssystem_1/database/dbHelper"
 	"rmssystem_1/middleware"
@@ -15,19 +15,17 @@ func SetAddressHandler(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
 		return
 	}
-
 	var req models.AddressReq
 	if err := utils.ParseJSONBody(r, &req); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
 	}
-
 	err = dbHelper.SetUserAddress(req, userID)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to save address")
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message": "Address Set Successfully",
 	})
 }

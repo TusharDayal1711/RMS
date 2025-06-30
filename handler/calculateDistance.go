@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"encoding/json"
+	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"rmssystem_1/middleware"
 	"rmssystem_1/services"
@@ -30,10 +30,8 @@ func CalculateDistance(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"message": "distance calculated",
-		"result": map[string]interface{}{
-			"distance_km": distanceKm,
-		},
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
+		"message": "successfully calculated distance",
+		"distance between house and restaurant is (in km) ::": distanceKm,
 	})
 }

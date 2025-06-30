@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"encoding/json"
+	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"rmssystem_1/database/dbHelper"
 	"rmssystem_1/middleware"
@@ -24,7 +24,7 @@ func AddDish(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to add dish")
 		return
 	}
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message":  "dish added successfully",
 		"added by": role,
 	})

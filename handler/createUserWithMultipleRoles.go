@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"encoding/json"
+	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"rmssystem_1/database/dbHelper"
 	"rmssystem_1/middleware"
@@ -27,7 +27,7 @@ func CreateUserWithRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"Password ":      MultiRolereq.Password,
 		"User Email Id ": MultiRolereq.Email,
 		"created by":     role,

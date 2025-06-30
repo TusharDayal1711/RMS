@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"encoding/json"
+	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"rmssystem_1/database/dbHelper"
 	"rmssystem_1/middleware"
@@ -22,7 +22,7 @@ func GetMyRestaurantsByCreatorId(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message": "restaurants fetched successfully",
 		"data":    restaurants,
 	})
