@@ -1,14 +1,13 @@
 package utils
 
 import (
-	"encoding/json"
+	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
-// struct of ClientError
 type ClientError struct {
 	Error      string `json:"error"`
 	Message    string `json:"message"`
@@ -26,7 +25,7 @@ func RespondError(w http.ResponseWriter, statusCode int, err error, userMessage 
 	}
 
 	w.WriteHeader(statusCode)
-	if err := json.NewEncoder(w).Encode(clientError); err != nil {
+	if err := jsoniter.NewEncoder(w).Encode(clientError); err != nil {
 		logrus.Errorf("failed to encode/send error response: %+v", err)
 	}
 }
