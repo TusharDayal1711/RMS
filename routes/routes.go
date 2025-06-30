@@ -23,6 +23,7 @@ func GetRoutes() *mux.Router {
 	protectedRoutes.HandleFunc("/user/distance", handler.CalculateDistance).Methods("GET")
 	protectedRoutes.HandleFunc("/GetAllrestaurant", handler.ListAllRestaurants).Methods("GET")
 	protectedRoutes.HandleFunc("/GetAllDishes", handler.GetAllDishesHandler).Methods("GET")
+	protectedRoutes.HandleFunc("/logout", handler.LogoutHandler).Methods("POST")
 
 	// SubAdmin routes
 	subAdminRoutes := protectedRoutes.PathPrefix("/subadmin").Subrouter()
@@ -33,7 +34,6 @@ func GetRoutes() *mux.Router {
 	subAdminRoutes.HandleFunc("/dishes-by-rest-id", handler.GetDishesByRestaurant).Methods("GET")
 	subAdminRoutes.HandleFunc("/restaurants-by-creator", handler.GetMyRestaurantsByCreatorId).Methods("GET")
 	subAdminRoutes.HandleFunc("/dishes-by-creator", handler.GetMyDishesHandler).Methods("GET")
-
 	subAdminRoutes.HandleFunc("/users-by-creator", handler.GetUsersCreatedById).Methods("GET")
 
 	// Admin routes

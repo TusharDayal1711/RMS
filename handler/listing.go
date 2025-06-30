@@ -20,12 +20,7 @@ func ListAllRestaurants(w http.ResponseWriter, r *http.Request) {
 func GetAllDishesHandler(w http.ResponseWriter, r *http.Request) {
 	dishes, err := dbHelper.GetAllDishes()
 	if err != nil {
-
-		w.WriteHeader(http.StatusInternalServerError)
-		jsoniter.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "failed to fetch dishes",
-		})
-		return
+		utils.RespondError(w, http.StatusInternalServerError, err, "failed to fetch dishes")
 	}
 	w.WriteHeader(http.StatusOK)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{

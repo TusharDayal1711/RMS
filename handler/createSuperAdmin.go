@@ -18,8 +18,29 @@ func CreateSuperAdmin() {
 		return
 	}
 
+	tx, err := database.DB.Beginx()
+	if err != nil {
+		log.Println("failed to start transaction:", err)
+		return
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			log.Println("transaction panicked and rolled back")
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+			log.Println("transaction rolled back due to error:", err)
+		} else {
+			err = tx.Commit()
+			if err != nil {
+				log.Println("failed to commit transaction:", err)
+			}
+		}
+	}()
+
 	var adminID uuid.UUID
-	err = database.DB.Get(&adminID, `
+	err = tx.Get(&adminID, `
 		INSERT INTO users (name, email, password)
 		VALUES ($1, $2, $3)
 		RETURNING id
@@ -32,7 +53,7 @@ func CreateSuperAdmin() {
 	var roleID uuid.UUID
 	err = database.DB.Get(&roleID, `SELECT id FROM roles WHERE role_name = 'admin'`)
 	if err != nil {
-		err = database.DB.Get(&roleID, `
+		err = tx.Get(&roleID, `
 			INSERT INTO roles (role_name)
 			VALUES ('admin')
 			RETURNING id
@@ -43,7 +64,7 @@ func CreateSuperAdmin() {
 		}
 	}
 
-	_, err = database.DB.Exec(`
+	_, err = tx.Exec(`
 		INSERT INTO user_roles (user_id, role_id, created_by)
 		VALUES ($1, $2, $3)
 	`, adminID, roleID, adminID)

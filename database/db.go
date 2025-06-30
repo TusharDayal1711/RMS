@@ -37,19 +37,10 @@ func migrateUp(db *sqlx.DB) error {
 		return err
 	}
 
-	version, dirty, err := m.Version()
-	if err != nil && err != migrate.ErrNilVersion {
-		return fmt.Errorf("version check failed: %w", err)
-	}
-	fmt.Printf("Before migration: version=%v dirty=%v\n", version, dirty)
-
 	if err := m.Up(); err != nil && err.Error() != "no change" {
 		return err
 	}
 
-	version, dirty, _ = m.Version()
-	fmt.Printf("After migration: version=%v dirty=%v\n", version, dirty)
-
-	fmt.Println("Migration completed.")
+	fmt.Println("Migration complete.")
 	return nil
 }
