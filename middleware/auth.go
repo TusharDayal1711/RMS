@@ -55,7 +55,14 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 				utils.RespondError(w, http.StatusInternalServerError, err, "failed to generate new access token")
 				return
 			}
-			w.Header().Set("new access token generated", newToken)
+			//regenerating refresh token
+			newRefreshToken, err := utils.GenerateRefreshToken(userID)
+			if err != nil {
+				utils.RespondError(w, http.StatusInternalServerError, err, "failed to generate new refresh token")
+			}
+			w.Header().Set("Authorization", newToken)
+			w.Header().Set("Refresh_token", newRefreshToken)
+
 		} else if err != nil {
 			utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
 			return
