@@ -1,0 +1,95 @@
+package utils
+
+import (
+	"fmt"
+	"os"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/pkg/errors"
+)
+
+var jwtSecret = []byte(os.Getenv("SECRET_KEY"))
+var refreshTokenSecret = []byte(os.Getenv("REFRESH_TOKEN"))
+
+func GenerateJWT(userID string, roles []string) (string, error) {
+	claims := jwt.MapClaims{
+		"sub":   userID,
+		"roles": roles,
+		"typ":   "access",
+		"exp":   time.Now().Add(5 * time.Minute).Unix(),
+		"iat":   time.Now().Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret)
+}
+
+func ParseJWT(tokenStr string) (string, []string, error) {
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
+
+	if err != nil || !token.Valid {
+		return "", nil, errors.New("invalid or expired token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", nil, errors.New("invalid token claims")
+	}
+
+	sub, ok := claims["sub"].(string)
+	if !ok {
+		return "", nil, errors.New("invalid 'sub' claim")
+	}
+
+	var roles []string
+	if AllRoles, ok := claims["roles"].([]interface{}); ok {
+		for _, r := range AllRoles {
+			if roleStr, ok := r.(string); ok {
+				roles = append(roles, roleStr)
+			}
+		}
+	}
+
+	return sub, roles, nil
+}
+
+func GenerateRefreshToken(userID string) (string, error) {
+	claims := jwt.MapClaims{
+		"sub": userID,
+		"typ": "refresh",
+		"exp": time.Now().Add(7 * 24 * time.Hour).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(refreshTokenSecret)
+}
+
+func ParseRefreshToken(tokenStr string) (string, error) {
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method")
+		}
+		return refreshTokenSecret, nil
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
+
+	if err != nil || !token.Valid {
+		return "", errors.New("invalid or expired refresh token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", errors.New("invalid token claims")
+	}
+
+	if claims["typ"] != "refresh" {
+		return "", errors.New("token is not a refresh token")
+	}
+
+	sub, ok := claims["sub"].(string)
+	if !ok {
+		return "", errors.New("invalid 'sub' claim")
+	}
+
+	return sub, nil
+}
