@@ -70,7 +70,7 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func RequireRole(requiredRole string) func(http.Handler) http.Handler {
+func RequireRole(requiredRoles ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, roles, err := GetUserAndRolesFromContext(r)
@@ -79,9 +79,11 @@ func RequireRole(requiredRole string) func(http.Handler) http.Handler {
 				return
 			}
 			for _, role := range roles {
-				if role == requiredRole {
-					next.ServeHTTP(w, r)
-					return
+				for _, requiredRole := range requiredRoles {
+					if role == requiredRole {
+						next.ServeHTTP(w, r)
+						return
+					}
 				}
 			}
 			http.Error(w, "unauthorized user", http.StatusForbidden)
