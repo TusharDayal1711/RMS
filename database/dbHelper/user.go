@@ -18,12 +18,28 @@ import (
 func CreatePublicUser(user models.User) (uuid.UUID, error) {
 	user.Email = strings.ToLower(user.Email)
 
-	// Check if user already exists
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+
+	// Checking if user already exists
 	var isExist uuid.UUID
-	err := database.DB.Get(&isExist, `
+	err = tx.QueryRow(`
 		SELECT id FROM users 
 		WHERE email = $1 AND archived_at IS NULL
-	`, user.Email)
+	`, user.Email).Scan(&isExist)
 	if err == nil {
 		return uuid.Nil, fmt.Errorf("email already exists")
 	} else if !errors.Is(err, sql.ErrNoRows) {
@@ -37,7 +53,7 @@ func CreatePublicUser(user models.User) (uuid.UUID, error) {
 	}
 
 	var newUserID uuid.UUID
-	err = database.DB.QueryRow(`
+	err = tx.QueryRow(`
 		INSERT INTO users (name, email, password)
 		VALUES ($1, $2, $3)
 		RETURNING id
@@ -47,20 +63,18 @@ func CreatePublicUser(user models.User) (uuid.UUID, error) {
 	}
 
 	const defaultRole = "user"
-
 	var roleID uuid.UUID
-
-	err = database.DB.Get(&roleID, `
+	err = tx.QueryRow(`
 		SELECT id FROM roles 
 		WHERE role_name = $1
-	`, defaultRole)
+	`, defaultRole).Scan(&roleID)
 	if err != nil {
 		fmt.Println("failed to find role 'user' ", err)
 		return uuid.Nil, fmt.Errorf("default user role not found: %w", err)
 	}
 
 	// Assign the role to the user
-	_, err = database.DB.Exec(`
+	_, err = tx.Exec(`
 		INSERT INTO user_roles (user_id, role_id, created_by)
 		VALUES ($1, $2, $1)
 	`, newUserID, roleID)
@@ -74,31 +88,49 @@ func CreatePublicUser(user models.User) (uuid.UUID, error) {
 func CreateUser(req models.CreateUserReq, createdBy string) error {
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
+
 		return err
 	}
+	tx, err := database.DB.Begin()
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
 	createdByUUID, err := uuid.Parse(createdBy)
 	if err != nil {
 		return err
 	}
 	var userID uuid.UUID
-	err = database.DB.Get(&userID, `
+	err = tx.QueryRow(`
 		INSERT INTO users (name, email, password)
 		VALUES ($1, $2, $3)
 		RETURNING id
-	`, req.Name, req.Email, hashedPassword)
+	`, req.Name, req.Email, hashedPassword).Scan(&userID)
 	if err != nil {
 		return err
 	}
+
 	var roleID uuid.UUID
-	err = database.DB.Get(&roleID, `
-		SELECT id FROM roles WHERE role_name = 'user'
-	`)
+	err = tx.QueryRow(`
+		SELECT id FROM roles 
+		WHERE role_name = 'user'
+	`).Scan(&roleID)
 	if err != nil {
 		return err
 	}
 
 	// Assign "user" role
-	_, err = database.DB.Exec(`
+	_, err = tx.Exec(`
 		INSERT INTO user_roles (user_id, role_id, created_by)
 		VALUES ($1, $2, $3)
 	`, userID, roleID, createdByUUID)
