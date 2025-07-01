@@ -5,26 +5,60 @@ import (
 	"net/http"
 	"rmssystem_1/database/dbHelper"
 	"rmssystem_1/utils"
+	"strconv"
 )
 
 // getting all the restaurent form db
 func ListAllRestaurants(w http.ResponseWriter, r *http.Request) {
-	restaurants, err := dbHelper.GetaAllRestaurant()
+	page := 1
+	limit := 10
+
+	if pageValue := r.URL.Query().Get("page"); pageValue != "" {
+		if p, err := strconv.Atoi(pageValue); err == nil {
+			page = p
+		}
+	}
+	if limitValue := r.URL.Query().Get("limit"); limitValue != "" {
+		if l, err := strconv.Atoi(limitValue); err == nil {
+			limit = l
+		}
+	}
+	offset := (page - 1) * limit
+	restaurants, err := dbHelper.GetAllRestaurant(limit, offset)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to fetch restaurants")
 		return
 	}
-	jsoniter.NewEncoder(w).Encode(restaurants)
+	w.WriteHeader(http.StatusOK)
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
+		"message":     "List Of All Restaurants",
+		"Restaurants": restaurants,
+	})
 }
 
 func GetAllDishesHandler(w http.ResponseWriter, r *http.Request) {
-	dishes, err := dbHelper.GetAllDishes()
+	page := 1
+	limit := 10
+	if p := r.URL.Query().Get("page"); p != "" {
+		if parsedPage, err := strconv.Atoi(p); err == nil && parsedPage > 0 {
+			page = parsedPage
+		}
+	}
+	if l := r.URL.Query().Get("limit"); l != "" {
+		if parsedLimit, err := strconv.Atoi(l); err == nil && parsedLimit > 0 {
+			limit = parsedLimit
+		}
+	}
+	offset := (page - 1) * limit
+	dishes, err := dbHelper.GetAllDishes(limit, offset)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to fetch dishes")
+		return
 	}
 	w.WriteHeader(http.StatusOK)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
-		"message": "dishes fetched successfully",
-		"data":    dishes,
+		"message":    "List Of Dishes",
+		"Dishes":       dishes,
 	})
 }
+
