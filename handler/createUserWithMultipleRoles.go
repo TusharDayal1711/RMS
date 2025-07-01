@@ -59,7 +59,7 @@ func CreateUserWithRolesByAdmins(w http.ResponseWriter, r *http.Request) {
 	if !isAdmin {
 		for _, role := range req.Roles {
 			if role != "user" {
-				utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
+				utils.RespondError(w, http.StatusBadRequest, err, "not authorized to create subAdmin with this permisssion")
 				return
 			}
 		}
