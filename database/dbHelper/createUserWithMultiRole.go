@@ -14,16 +14,31 @@ func CreateUserWithMultiRole(req models.MultiRole, creatorID string) error {
 		return err
 	}
 
-	_, err = database.DB.Exec(`
-		INSERT INTO users (name, email, password)
-		VALUES ($1, $2, $3)
-	`, req.Name, req.Email, string(hashedPassword))
+	tx, err := database.DB.Beginx()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+
+	_, err = tx.Exec(`
+		INSERT INTO users (name, email, password, created_by)
+		VALUES ($1, $2, $3, $4)
+	`, req.Name, req.Email, string(hashedPassword), creatorID)
 	if err != nil {
 		return err
 	}
 
 	var userId uuid.UUID
-	err = database.DB.Get(&userId, `SELECT id FROM users WHERE email = $1`, req.Email)
+	err = tx.Get(&userId, `SELECT id FROM users WHERE email = $1`, req.Email)
 	if err != nil {
 		return fmt.Errorf("failed to fetch user ID, error :: %w", err)
 	}
@@ -34,7 +49,7 @@ func CreateUserWithMultiRole(req models.MultiRole, creatorID string) error {
 
 	for _, role := range req.Roles {
 		var roleUUID uuid.UUID
-		err = database.DB.Get(&roleUUID,
+		err = tx.Get(&roleUUID,
 			`SELECT id 
 				   FROM roles 
 				   WHERE role_name = $1`,
@@ -42,7 +57,7 @@ func CreateUserWithMultiRole(req models.MultiRole, creatorID string) error {
 		if err != nil {
 			return fmt.Errorf("failed to fetch role ID, error :: %w", err)
 		}
-		_, err = database.DB.Exec(
+		_, err = tx.Exec(
 			`INSERT INTO user_roles (user_id, role_id, created_by) 
 				   VALUES ($1, $2, $3)`, userId, roleUUID, createdByUUID)
 		if err != nil {
