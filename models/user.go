@@ -35,6 +35,13 @@ type UserCreatedBy struct {
 	ID        uuid.UUID `db:"id" json:"id"`
 	Name      string    `db:"name" json:"name"`
 	Email     string    `db:"email" json:"email"`
-	Role      string    `db:"role_name" json:"role_name,"`
+	Role      string    `db:"role" json:"role,"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+}
+
+type SubAdminCreatedBy struct {
+	ID        uuid.UUID `db:"id" json:"id"`
+	Name      string    `db:"name" json:"name"`
+	Email     string    `db:"email" json:"email"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }

@@ -6,14 +6,14 @@ import (
 )
 
 func GetaAllRestaurant() ([]models.RestaurantReq, error) {
-	var restaurants []models.RestaurantReq
+	restaurants := make([]models.RestaurantReq, 0)
 	query := `SELECT id, name, address FROM restaurants WHERE archived_at IS NULL`
 	err := db.DB.Select(&restaurants, query)
 	return restaurants, err
 }
 
 func GetAllDishes() ([]models.AllDishReq, error) {
-	var dishes []models.AllDishReq
+	dishes := make([]models.AllDishReq, 0)
 	err := db.DB.Select(&dishes, `
 		SELECT id, name, price, restaurant_id, created_by, created_at
 		FROM dishes

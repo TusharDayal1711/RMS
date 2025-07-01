@@ -16,7 +16,6 @@ func RegisterPublicUser(w http.ResponseWriter, r *http.Request) {
 	if err := utils.ParseJSONBody(r, &user); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
 	}
-
 	userID, err := dbHelper.CreatePublicUser(user)
 	if err != nil {
 		if strings.Contains(err.Error(), "email already exists") {
@@ -26,7 +25,6 @@ func RegisterPublicUser(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message": "User created successfully",
 		"user_id": userID,
@@ -43,13 +41,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusBadRequest, nil, "email and password are required")
 		return
 	}
-
 	userID, hashedPassword, err := dbHelper.GetUserByEmail(req.Email)
 	if err != nil {
 		utils.RespondError(w, http.StatusUnauthorized, err, "invalid email or password")
 		return
 	}
-
 	if !utils.CheckHashPassword(req.Password, hashedPassword) {
 		utils.RespondError(w, http.StatusUnauthorized, nil, "invalid email or password")
 		return
@@ -73,11 +69,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = dbHelper.SaveSession(userID, refreshToken)
-	if err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, err, "failed to save session")
-		return
-	}
+	// no need for session
+	//err = dbHelper.SaveSession(userID, refreshToken)
+	//if err != nil {
+	//	utils.RespondError(w, http.StatusInternalServerError, err, "failed to save session")
+	//	return
+	//}
 
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message":       "User logged successfully",
@@ -87,17 +84,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	userID, _, err := middleware.GetUserAndRolesFromContext(r)
+	_, _, err := middleware.GetUserAndRolesFromContext(r)
 	if err != nil {
 		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
 		return
 	}
 
-	err = dbHelper.DeleteSessionRecord(userID)
-	if err != nil {
-		http.Error(w, "failed to delete records ", http.StatusInternalServerError)
-		return
-	}
+	//no need or session table records
+	//err = dbHelper.DeleteSessionRecord(userID)
+	//if err != nil {
+	//	http.Error(w, "failed to delete records ", http.StatusInternalServerError)
+	//	return
+	//}
 	jsoniter.NewEncoder(w).Encode(map[string]string{
 		"message": "Logout successful",
 	})

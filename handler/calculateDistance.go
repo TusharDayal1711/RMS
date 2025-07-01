@@ -23,7 +23,7 @@ func CalculateDistance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	distanceKm, err := services.CalculateRestaurantDistanceByID(restId, addId)
+	distanceInKm, err := services.CalculateRestaurantDistanceByID(restId, addId)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to calculate distance")
 		return
@@ -31,7 +31,6 @@ func CalculateDistance(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
-		"message": "successfully calculated distance",
-		"distance between house and restaurant is (in km) ::": distanceKm,
+		"distance between house and restaurant is (in km) ::": distanceInKm,
 	})
 }

@@ -11,8 +11,7 @@ func GetRestaurantsByCreator(userID string) ([]models.Restaurant, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	var restaurants []models.Restaurant
+	restaurants := make([]models.Restaurant, 0)
 	err = database.DB.Select(&restaurants, `
 		SELECT id, name, address, longitude, latitude, created_by, created_at
 		FROM restaurants

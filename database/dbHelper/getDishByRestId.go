@@ -11,8 +11,7 @@ func GetDishesByRestaurant(restaurantID string) ([]models.DishReq, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	var dishes []models.DishReq
+	dishes := make([]models.DishReq, 0)
 	err = database.DB.Select(&dishes, `
 		SELECT id, name, price, restaurant_id, created_by, created_at
 		FROM dishes

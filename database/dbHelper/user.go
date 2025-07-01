@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"rmssystem_1/utils"
-	"time"
-
 	"strings"
 
 	"github.com/google/uuid"
@@ -162,10 +160,11 @@ func GetUserRoles(userID string) ([]string, error) {
 	return roles, err
 }
 
-func SaveSession(userID, refreshToken string) error {
-	_, err := database.DB.Exec(`
-		INSERT INTO sessions (user_id, refresh_token, expire_at)
-		VALUES ($1, $2, $3)
-	`, userID, refreshToken, time.Now().Add(7*24*time.Hour))
-	return err
-}
+//no need to create session records
+//func SaveSession(userID, refreshToken string) error {
+//	_, err := database.DB.Exec(`
+//		INSERT INTO sessions (user_id, refresh_token, expire_at)
+//		VALUES ($1, $2, $3)
+//	`, userID, refreshToken, time.Now().Add(7*24*time.Hour))
+//	return err
+//}

@@ -1,0 +1,12 @@
+# GoLand project settings
+.idea/
+
+# Environment variables
+.env
+
+# PostgreSQL volume data
+pgdata/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
