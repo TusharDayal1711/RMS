@@ -1,44 +1,6 @@
-//make separate login function for users, admin and subadmin
+// make seperate login function for users, admin and subadmin _/
 //remove session table, no need to invalidate session
 //redefine routes in nested format
 //define models using make keyword, as frontend cannot handle null but can handle empty fields
 //implement pagination in get all routes i.e restaurant, users
-//use camel case in json naming
-
-func ListAllRestaurants(w http.ResponseWriter, r *http.Request) {
-	// Default pagination values
-	page := 1
-	limit := 10
-
-	// Parse ?page=1&limit=10
-	if pageParam := r.URL.Query().Get("page"); pageParam != "" {
-		if parsedPage, err := strconv.Atoi(pageParam); err == nil && parsedPage > 0 {
-			page = parsedPage
-		}
-	}
-	if limitParam := r.URL.Query().Get("limit"); limitParam != "" {
-		if parsedLimit, err := strconv.Atoi(limitParam); err == nil && parsedLimit > 0 {
-			limit = parsedLimit
-		}
-	}
-	offset := (page - 1) * limit
-
-	// Fetch paginated restaurants
-	restaurants, err := dbHelper.GetAllRestaurant(limit, offset)
-	if err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, err, "failed to fetch restaurants")
-		return
-	}
-
-	// Return result
-	response := map[string]interface{}{
-		"message":     "List of restaurants",
-		"data":        restaurants,
-		"page":        page,
-		"limit":       limit,
-		"item_count":  len(restaurants),
-	}
-	w.WriteHeader(http.StatusOK)
-	jsoniter.NewEncoder(w).Encode(response)
-}
-
+//use camel case in json namming

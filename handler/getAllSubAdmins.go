@@ -9,12 +9,13 @@ import (
 )
 
 func GetAllSubAdmins(w http.ResponseWriter, r *http.Request) {
+	limit, offset := utils.GetPageLimitAndOffset(r)
 	adminId, _, err := middleware.GetUserAndRolesFromContext(r)
 	if err != nil {
 		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
 		return
 	}
-	subAdmins, err := dbHelper.GetAllSubAdminsList(adminId)
+	subAdmins, err := dbHelper.GetAllSubAdminsList(adminId, limit, offset)
 	if err != nil {
 		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
 		return
@@ -23,5 +24,7 @@ func GetAllSubAdmins(w http.ResponseWriter, r *http.Request) {
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message": "List of subAdmins created by Admin",
 		"data":    subAdmins,
+		"page":    r.URL.Query().Get("page"),
+		"limit":   r.URL.Query().Get("limit"),
 	})
 }

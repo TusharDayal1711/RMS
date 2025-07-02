@@ -8,7 +8,7 @@ import (
 	"rmssystem_1/utils"
 )
 
-func GetMyRestaurantsByCreatorId(w http.ResponseWriter, r *http.Request) {
+func GetMyRestaurantsByAdminId(w http.ResponseWriter, r *http.Request) {
 	userID, _, err := middleware.GetUserAndRolesFromContext(r)
 	if err != nil {
 		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")

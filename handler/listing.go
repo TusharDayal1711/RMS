@@ -10,20 +10,7 @@ import (
 
 // getting all the restaurent form db
 func ListAllRestaurants(w http.ResponseWriter, r *http.Request) {
-	page := 1
-	limit := 10
-
-	if pageValue := r.URL.Query().Get("page"); pageValue != "" {
-		if p, err := strconv.Atoi(pageValue); err == nil {
-			page = p
-		}
-	}
-	if limitValue := r.URL.Query().Get("limit"); limitValue != "" {
-		if l, err := strconv.Atoi(limitValue); err == nil {
-			limit = l
-		}
-	}
-	offset := (page - 1) * limit
+	limit, offset := utils.GetPageLimitAndOffset(r)
 	restaurants, err := dbHelper.GetAllRestaurant(limit, offset)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to fetch restaurants")
@@ -57,8 +44,7 @@ func GetAllDishesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
-		"message":    "List Of Dishes",
-		"Dishes":       dishes,
+		"message": "List Of Dishes",
+		"Dishes":  dishes,
 	})
 }
-
