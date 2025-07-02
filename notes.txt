@@ -1,6 +1,0 @@
-// make seperate login function for users, admin and subadmin _/
-//remove session table, no need to invalidate session
-//redefine routes in nested format
-//define models using make keyword, as frontend cannot handle null but can handle empty fields
-//implement pagination in get all routes i.e restaurant, users
-//use camel case in json namming
