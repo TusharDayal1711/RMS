@@ -11,13 +11,13 @@ func GetRoutes() *mux.Router {
 	mainRouter := mux.NewRouter()
 	api := mainRouter.PathPrefix("/api/v1").Subrouter()
 
-	// --- Public Routes ---
+	//public routes
 	api.HandleFunc("/register", handler.RegisterPublicUser).Methods("POST")
 	api.HandleFunc("/login", handler.Login).Methods("POST")
 	api.HandleFunc("/restaurant", handler.ListAllRestaurants).Methods("GET")
 	api.HandleFunc("/dishes", handler.GetAllDishesHandler).Methods("GET")
 
-	//
+	//protected routes
 	protectedRoutes := api.NewRoute().Subrouter()
 	protectedRoutes.Use(middleware.JWTAuthMiddleware)
 
@@ -32,15 +32,15 @@ func GetRoutes() *mux.Router {
 	sharedRoutes.HandleFunc("/restaurant", handler.CreateRestaurantHandler).Methods("POST")
 	sharedRoutes.HandleFunc("/dish", handler.AddDish).Methods("POST")
 	sharedRoutes.HandleFunc("/restaurant/dishes", handler.GetDishesByRestaurant).Methods("GET")
-	sharedRoutes.HandleFunc("/user/restaurant", handler.GetMyRestaurantsByCreatorId).Methods("GET")
-	sharedRoutes.HandleFunc("/user/dishes", handler.GetMyDishesHandler).Methods("GET")
-	sharedRoutes.HandleFunc("/users-by-creator", handler.GetUsersCreatedById).Methods("GET")
-	sharedRoutes.HandleFunc("/create-user", handler.CreateUserWithRolesByAdmins).Methods("POST")
+	sharedRoutes.HandleFunc("/user/restaurant", handler.GetMyRestaurantsByAdminId).Methods("GET")
+	sharedRoutes.HandleFunc("/user/dishes", handler.GetMyDishesByAdminId).Methods("GET")
+	sharedRoutes.HandleFunc("/user/users", handler.GetUsersCreatedById).Methods("GET")
+	sharedRoutes.HandleFunc("/user", handler.CreateUserWithRolesByAdmins).Methods("POST")
 
 	//only admim
 	adminRoutes := protectedRoutes.PathPrefix("/admin").Subrouter()
 	adminRoutes.Use(middleware.RequireRole("admin"))
-	adminRoutes.HandleFunc("/sub-admins", handler.GetAllSubAdmins).Methods("GET")
+	adminRoutes.HandleFunc("/subadmins", handler.GetAllSubAdmins).Methods("GET")
 
 	return mainRouter
 }
