@@ -4,6 +4,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"rmssystem_1/database/dbHelper"
+	"rmssystem_1/middleware"
 	"rmssystem_1/models"
 	"rmssystem_1/utils"
 )
@@ -42,13 +43,13 @@ func LoginSubAdmins(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusUnauthorized, nil, "unauthorized")
 		return
 	}
-	accessToken, err := utils.GenerateJWT(subAdminId, roles)
+	accessToken, err := middleware.GenerateJWT(subAdminId, roles)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to generate access token")
 		return
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(subAdminId)
+	refreshToken, err := middleware.GenerateRefreshToken(subAdminId)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to generate refresh token")
 		return

@@ -23,14 +23,14 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 			utils.RespondError(w, http.StatusUnauthorized, errors.New("missing access token"), "missing access token")
 			return
 		}
-		userID, roles, err := utils.ParseJWT(accessToken)
+		userID, roles, err := ParseJWT(accessToken)
 		if err != nil && strings.Contains(err.Error(), "invalid or expired token") {
 			refreshToken := r.Header.Get("refresh_token")
 			if refreshToken == "" {
 				utils.RespondError(w, http.StatusUnauthorized, errors.New("missing refresh token"), "access token expired, and refresh token missing")
 				return
 			}
-			userID, err = utils.ParseRefreshToken(refreshToken)
+			userID, err = ParseRefreshToken(refreshToken)
 			if err != nil {
 				utils.RespondError(w, http.StatusUnauthorized, err, "invalid or expired refresh token")
 				return
@@ -47,13 +47,13 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 				utils.RespondError(w, http.StatusInternalServerError, err, "failed to fetch roles")
 				return
 			}
-			newToken, err := utils.GenerateJWT(userID, roles)
+			newToken, err := GenerateJWT(userID, roles)
 			if err != nil {
 				utils.RespondError(w, http.StatusInternalServerError, err, "failed to generate new access token")
 				return
 			}
 			//regenerating refresh token
-			newRefreshToken, err := utils.GenerateRefreshToken(userID)
+			newRefreshToken, err := GenerateRefreshToken(userID)
 			if err != nil {
 				utils.RespondError(w, http.StatusInternalServerError, err, "failed to generate new refresh token")
 			}
