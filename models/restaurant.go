@@ -17,7 +17,6 @@ type Restaurant struct {
 }
 
 type RestaurantReq struct {
-	ID        string  `json:"id" db:"id"`
 	Name      string  `json:"name" db:"name"`
 	Address   string  `json:"address" db:"address"`
 	Longitude float64 `db:"longitude" json:"longitude"`

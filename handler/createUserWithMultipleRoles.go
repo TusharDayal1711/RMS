@@ -35,6 +35,10 @@ func CreateUserWithRoles(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// In this admin and subadmin can create new user
+// admin can create user with both subadmin and user permission
+// subadmin can only create new users, not admin or subadmin
+// "username"
 func CreateUserWithRolesByAdmins(w http.ResponseWriter, r *http.Request) {
 	creatorId, roles, err := middleware.GetUserAndRolesFromContext(r)
 	if err != nil {
@@ -45,8 +49,12 @@ func CreateUserWithRolesByAdmins(w http.ResponseWriter, r *http.Request) {
 	if err := utils.ParseJSONBody(r, &req); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
 	}
+	if req.Email == "" || req.Password == "" || req.Name == "" {
+		utils.RespondError(w, http.StatusBadRequest, nil, "username, email and password are required")
+		return
+	}
 	if len(req.Roles) == 0 {
-		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
+		utils.RespondError(w, http.StatusBadRequest, nil, "valid role required")
 		return
 	}
 	isAdmin := false

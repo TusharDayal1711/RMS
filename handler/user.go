@@ -16,6 +16,11 @@ func RegisterPublicUser(w http.ResponseWriter, r *http.Request) {
 	if err := utils.ParseJSONBody(r, &user); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
 	}
+	if user.Email == "" || user.Password == "" || user.Name == "" {
+		utils.RespondError(w, http.StatusBadRequest, nil, "username, email and password are required")
+		return
+	}
+
 	userID, err := dbHelper.CreatePublicUser(user)
 	if err != nil {
 		if strings.Contains(err.Error(), "email already exists") {
@@ -77,7 +82,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	//}
 
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
-		"message":       "User logged successfully",
+		"message":       "User logged-in successfully",
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 	})

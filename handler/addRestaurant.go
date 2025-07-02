@@ -15,10 +15,24 @@ func CreateRestaurantHandler(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
 		return
 	}
+	//ID        string  `json:"id" db:"id"`
+	//Name      string  `json:"name" db:"name"`
+	//Address   string  `json:"address" db:"address"`
+	//Longitude float64 `db:"longitude" json:"longitude"`
+	//Latitude  float64 `db:"latitude" json:"latitude"`
 	var req models.RestaurantReq
 	if err := utils.ParseJSONBody(r, &req); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
 	}
+	if req.Name == "" || req.Address == "" {
+		utils.RespondError(w, http.StatusBadRequest, err, "invalid restaurant name or address")
+		return
+	}
+	if req.Longitude < -180 || req.Longitude > 180 || req.Latitude < -90 || req.Latitude > 90 {
+		utils.RespondError(w, http.StatusBadRequest, nil, "valid coordinates required")
+		return
+	}
+
 	err = dbHelper.CreateNewRestaurant(req, userID)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to create restaurant")

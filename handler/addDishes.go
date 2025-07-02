@@ -19,6 +19,13 @@ func AddDish(w http.ResponseWriter, r *http.Request) {
 	if err := utils.ParseJSONBody(r, &req); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
 	}
+	if req.Name == "" || req.RestaurantID == "" {
+		utils.RespondError(w, http.StatusBadRequest, nil, "valid name and restaurant ID is required")
+	}
+	if req.Price < 0 {
+		utils.RespondError(w, http.StatusBadRequest, nil, "valid price required")
+	}
+
 	err = dbHelper.AddNewDish(req, userID)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to add dish")

@@ -19,6 +19,9 @@ func SetAddressHandler(w http.ResponseWriter, r *http.Request) {
 	if err := utils.ParseJSONBody(r, &req); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
 	}
+	if req.Address == "" || req.Longitude < -180 || req.Longitude > 180 || req.Latitude < -90 || req.Latitude > 90 {
+		utils.RespondError(w, http.StatusBadRequest, nil, "address along with coordinates required")
+	}
 	err = dbHelper.SetUserAddress(req, userID)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to save address")
