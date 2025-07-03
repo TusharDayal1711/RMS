@@ -19,6 +19,7 @@ func GetRoutes() *mux.Router {
 	api.HandleFunc("/restaurants", handler.ListAllRestaurants).Methods("GET")
 	api.HandleFunc("/dishes", handler.GetAllDishesHandler).Methods("GET")
 	api.HandleFunc("/restaurant", handler.GetRestaurantById).Methods("GET")
+	api.HandleFunc("/restaurant/dishes", handler.GetDishesByRestaurant).Methods("GET")
 
 	//protected routes
 	protectedRoutes := api.NewRoute().Subrouter()
@@ -33,11 +34,10 @@ func GetRoutes() *mux.Router {
 	sharedRoutes.Use(middleware.RequireRole("admin", "subAdmin"))
 	sharedRoutes.HandleFunc("/restaurant", handler.CreateRestaurantHandler).Methods("POST")
 	sharedRoutes.HandleFunc("/dish", handler.AddDish).Methods("POST")
-	sharedRoutes.HandleFunc("/restaurant/dishes", handler.GetDishesByRestaurant).Methods("GET")
 	sharedRoutes.HandleFunc("/user/restaurant", handler.GetMyRestaurantsByAdminId).Methods("GET")
 	sharedRoutes.HandleFunc("/user/dishes", handler.GetMyDishesByAdminId).Methods("GET")
 	sharedRoutes.HandleFunc("/user/users", handler.GetUsersCreatedById).Methods("GET")
-	sharedRoutes.HandleFunc("/user", handler.CreateUserWithRolesByAdmins).Methods("POST")
+	sharedRoutes.HandleFunc("/user/register", handler.CreateUserWithRolesByAdmins).Methods("POST")
 
 	//only admim
 	adminRoutes := protectedRoutes.PathPrefix("/admin").Subrouter()
