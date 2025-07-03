@@ -9,14 +9,12 @@ import (
 
 func GetDishesByRestaurant(w http.ResponseWriter, r *http.Request) {
 	restaurantID := r.URL.Query().Get("restaurant_id")
-	limit, offset := utils.GetPageLimitAndOffset(r)
 	if restaurantID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		jsoniter.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "restaurant_id is required",
-		})
+		utils.RespondError(w, http.StatusBadRequest, nil, "restaurant id is required")
 		return
 	}
+
+	limit, offset := utils.GetPageLimitAndOffset(r)
 	dishes, err := dbHelper.GetDishesByRestaurant(restaurantID, limit, offset)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

@@ -6,12 +6,12 @@ import (
 	"rmssystem_1/models"
 )
 
-func GetDishesByRestaurant(restaurantID string, limit int, offset int) ([]models.DishReq, error) {
+func GetDishesByRestaurant(restaurantID string, limit int, offset int) ([]models.AllDishReq, error) {
 	restUUID, err := uuid.Parse(restaurantID)
 	if err != nil {
 		return nil, err
 	}
-	dishes := make([]models.DishReq, 0)
+	dishes := make([]models.AllDishReq, 0)
 	err = database.DB.Select(&dishes, `
 		SELECT id, name, price, restaurant_id, created_by, created_at
 		FROM dishes
