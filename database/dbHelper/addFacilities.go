@@ -5,7 +5,6 @@ import (
 	"github.com/google/uuid"
 	"rmssystem_1/database"
 	"rmssystem_1/models"
-	"strings"
 )
 
 func CreateNewRestaurant(req models.RestaurantReq, creator string) error {
@@ -23,8 +22,6 @@ func CreateNewRestaurant(req models.RestaurantReq, creator string) error {
 } //
 
 func AddNewDish(req models.DishReq, addedBy string) error {
-	req.Name = strings.TrimSpace(req.Name)
-
 	restUUID, err := uuid.Parse(req.RestaurantID)
 	if err != nil {
 		return fmt.Errorf("invalid restaurant ID: %w", err)
