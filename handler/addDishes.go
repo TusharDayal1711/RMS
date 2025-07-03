@@ -15,22 +15,28 @@ func AddDish(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
 		return
 	}
+
 	var req models.DishReq
 	if err := utils.ParseJSONBody(r, &req); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
+		return
 	}
+
 	if req.Name == "" || req.RestaurantID == "" {
 		utils.RespondError(w, http.StatusBadRequest, nil, "valid name and restaurant ID is required")
+		return
 	}
 	if req.Price < 0 {
 		utils.RespondError(w, http.StatusBadRequest, nil, "valid price required")
+		return
 	}
 
 	err = dbHelper.AddNewDish(req, userID)
 	if err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, err, "failed to add dish")
+		utils.RespondError(w, http.StatusInternalServerError, err, "failed to add dish...")
 		return
 	}
+
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message":  "dish added successfully",
 		"added by": role,

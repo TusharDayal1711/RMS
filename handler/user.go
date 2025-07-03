@@ -62,13 +62,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, err := utils.GenerateJWT(userID, roles)
+	accessToken, err := middleware.GenerateJWT(userID, roles)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to generate access token")
 		return
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(userID)
+	refreshToken, err := middleware.GenerateRefreshToken(userID)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to generate refresh token")
 		return

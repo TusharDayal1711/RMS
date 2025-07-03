@@ -6,7 +6,7 @@ import (
 	"rmssystem_1/models"
 )
 
-func GetDishesByRestaurant(restaurantID string) ([]models.DishReq, error) {
+func GetDishesByRestaurant(restaurantID string, limit int, offset int) ([]models.DishReq, error) {
 	restUUID, err := uuid.Parse(restaurantID)
 	if err != nil {
 		return nil, err
@@ -17,6 +17,7 @@ func GetDishesByRestaurant(restaurantID string) ([]models.DishReq, error) {
 		FROM dishes
 		WHERE restaurant_id = $1 AND archived_at IS NULL
 		ORDER BY created_at DESC
-	`, restUUID)
+		LIMIT $2 OFFSET $3
+	`, restUUID, limit, offset)
 	return dishes, err
 }

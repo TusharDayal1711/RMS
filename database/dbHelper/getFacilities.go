@@ -8,7 +8,7 @@ import (
 func GetAllRestaurant(limit, offset int) ([]models.RestaurantReq, error) {
 	restaurants := make([]models.RestaurantReq, 0)
 	err := db.DB.Select(&restaurants, `
-		SELECT id, name, address 
+		SELECT name, address, longitude, latitude
 		FROM restaurants 
 		WHERE archived_at IS NULL 
 		ORDER BY created_at DESC

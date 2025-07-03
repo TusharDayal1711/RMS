@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"rmssystem_1/database/dbHelper"
 	"rmssystem_1/utils"
-	"strconv"
 )
 
 // getting all the restaurent form db
@@ -24,19 +23,8 @@ func ListAllRestaurants(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllDishesHandler(w http.ResponseWriter, r *http.Request) {
-	page := 1
-	limit := 10
-	if p := r.URL.Query().Get("page"); p != "" {
-		if parsedPage, err := strconv.Atoi(p); err == nil && parsedPage > 0 {
-			page = parsedPage
-		}
-	}
-	if l := r.URL.Query().Get("limit"); l != "" {
-		if parsedLimit, err := strconv.Atoi(l); err == nil && parsedLimit > 0 {
-			limit = parsedLimit
-		}
-	}
-	offset := (page - 1) * limit
+
+	limit, offset := utils.GetPageLimitAndOffset(r)
 	dishes, err := dbHelper.GetAllDishes(limit, offset)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to fetch dishes")

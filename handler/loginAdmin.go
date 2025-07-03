@@ -35,7 +35,7 @@ func LoginAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 	isAdmin := false
 	for _, role := range roles {
-		if role == "subAdmin" {
+		if role == "admin" {
 			isAdmin = true
 		}
 	}

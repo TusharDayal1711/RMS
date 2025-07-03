@@ -9,13 +9,16 @@ import (
 
 func GetRoutes() *mux.Router {
 	mainRouter := mux.NewRouter()
-	api := mainRouter.PathPrefix("/api/v1").Subrouter()
+	api := mainRouter.PathPrefix("/api").Subrouter()
 
 	//public routes
 	api.HandleFunc("/register", handler.RegisterPublicUser).Methods("POST")
-	api.HandleFunc("/login", handler.Login).Methods("POST")
-	api.HandleFunc("/restaurant", handler.ListAllRestaurants).Methods("GET")
+	api.HandleFunc("/user/login", handler.Login).Methods("POST")
+	api.HandleFunc("/subadmin/login", handler.LoginSubAdmins).Methods("POST")
+	api.HandleFunc("/admin/login", handler.LoginAdmin).Methods("POST")
+	api.HandleFunc("/restaurants", handler.ListAllRestaurants).Methods("GET")
 	api.HandleFunc("/dishes", handler.GetAllDishesHandler).Methods("GET")
+	api.HandleFunc("/restaurant", handler.GetRestaurantById).Methods("GET")
 
 	//protected routes
 	protectedRoutes := api.NewRoute().Subrouter()
@@ -28,7 +31,6 @@ func GetRoutes() *mux.Router {
 	//shared route admin and subadmin
 	sharedRoutes := protectedRoutes.PathPrefix("/common").Subrouter()
 	sharedRoutes.Use(middleware.RequireRole("admin", "subAdmin"))
-
 	sharedRoutes.HandleFunc("/restaurant", handler.CreateRestaurantHandler).Methods("POST")
 	sharedRoutes.HandleFunc("/dish", handler.AddDish).Methods("POST")
 	sharedRoutes.HandleFunc("/restaurant/dishes", handler.GetDishesByRestaurant).Methods("GET")

@@ -48,6 +48,7 @@ func CreateUserWithRolesByAdmins(w http.ResponseWriter, r *http.Request) {
 	var req models.MultiRole
 	if err := utils.ParseJSONBody(r, &req); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
+		return
 	}
 	if req.Email == "" || req.Password == "" || req.Name == "" {
 		utils.RespondError(w, http.StatusBadRequest, nil, "username, email and password are required")
