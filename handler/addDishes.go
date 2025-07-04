@@ -37,6 +37,7 @@ func AddDish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusCreated)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message":  "dish added successfully",
 		"added by": role,

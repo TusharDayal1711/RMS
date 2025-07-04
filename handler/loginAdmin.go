@@ -53,6 +53,7 @@ func LoginAdmin(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to generate refresh token")
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message":       "Admin log-in successfully",
 		"access_token":  accessToken,

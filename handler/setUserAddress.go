@@ -29,7 +29,7 @@ func SetAddressHandler(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to save address")
 		return
 	}
-
+	w.WriteHeader(http.StatusCreated)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message": "Address Set Successfully",
 	})

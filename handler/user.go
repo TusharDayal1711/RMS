@@ -30,6 +30,7 @@ func RegisterPublicUser(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	w.WriteHeader(http.StatusCreated)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message": "User created successfully",
 		"user_id": userID,
@@ -80,7 +81,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	//	utils.RespondError(w, http.StatusInternalServerError, err, "failed to save session")
 	//	return
 	//}
-
+	w.WriteHeader(http.StatusOK)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message":       "User logged-in successfully",
 		"access_token":  accessToken,
@@ -101,6 +102,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	//	http.Error(w, "failed to delete records ", http.StatusInternalServerError)
 	//	return
 	//}
+	w.WriteHeader(http.StatusOK)
 	jsoniter.NewEncoder(w).Encode(map[string]string{
 		"message": "Logout successful",
 	})

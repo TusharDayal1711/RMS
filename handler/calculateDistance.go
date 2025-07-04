@@ -29,7 +29,7 @@ func CalculateDistance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"distance between house and restaurant is (in km) ::": distanceInKm,
 	})

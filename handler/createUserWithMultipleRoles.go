@@ -35,10 +35,9 @@ func CreateUserWithRoles(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// In this admin and subadmin can create new user
-// admin can create user with both subadmin and user permission
-// subadmin can only create new users, not admin or subadmin
-// "username"
+// In this admin and subadmin can create new user,
+// admin can create user with both subadmin and user permission,
+// subadmin can only create new users, not admin or subadmin,
 func CreateUserWithRolesByAdmins(w http.ResponseWriter, r *http.Request) {
 	creatorId, roles, err := middleware.GetUserAndRolesFromContext(r)
 	if err != nil {
@@ -78,7 +77,7 @@ func CreateUserWithRolesByAdmins(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to create user")
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"Password ":      req.Password,
 		"User Email Id ": req.Email,
